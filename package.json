@@ -1,0 +1,38 @@
+{
+  "name": "@fablemaker/core",
+  "version": "0.1.0",
+  "description": "The core game engine used for Fable Maker",
+  "main": "index.js",
+  "scripts": {
+    "build": "node ./build.js",
+    "dev": "node ./build.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FableMakerEngine/core.git"
+  },
+  "keywords": [
+    "fable-maker",
+    "game",
+    "engine",
+    "2d"
+  ],
+  "author": "inc0der & nio kasgami",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FableMakerEngine/core/issues"
+  },
+  "homepage": "https://github.com/FableMakerEngine/core#readme",
+  "dependencies": {
+    "cyclops": "file:../cyclops"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "estrella": "^1.4.1",
+    "http-server": "^14.1.0",
+    "pixi.js": "^6.3.0"
+  }
+}

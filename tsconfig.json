@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/lib",
+    "target": "EsNext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist/lib",
+    "noImplicitOverride": true,
+    "noImplicitAny": true,
+    "paths": {
+      "mini-signals": [
+        "./node_modules/resource-loader/typings/mini-signals.d.ts"
+      ]
+    },
+  },
+  "files": [
+    "src/main.ts"
+  ]
+}
