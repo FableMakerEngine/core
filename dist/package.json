@@ -1,0 +1,9 @@
+{
+  "name": "pixi-game-base",
+  "main": "index.html",
+  "type": "module",
+  "window": {
+    "width": 640,
+    "height": 480
+  }
+}
