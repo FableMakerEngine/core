@@ -1,0 +1,41 @@
+/*
+* the typewriter parser allow to handle very easy to use script like language for dialogues and story flow
+* it is very similar to JS 
+*/ 
+
+// this is a comment
+this is a generic text that is read by the engine 
+
+@local myLocal or @var // variable local to the file is not registered to the manager
+@global myGlobal // a variable global to the whole savefile
+@immortal myImmortal // a variable who is persistent across savefile can be either local or global
+@store (variableName, scope, value) // access directly  the variableManager and store a new variable or existing one
+@get (variableNameToGet, VariableToSendInfo) // access the variable manager and store the info into an existing or local variable
+
+// loop will loop an specific section until the condition is met
+@loop (condition) {
+    // content 
+}
+
+// an example of a loop condition would be : 
+@loop (10){
+  @sfx ("thunder", 100,100,100)
+}
+
+// loop also has an internal 'i' which can be used
+@loop (i...10){
+  @if(i >= 5 and playerIsDeath == true){
+    @break
+  }
+}
+@break // break the existing loop and jump on the next condition
+
+
+@messageBox("MyMessage", coords)
+
+@if() {
+
+} 
+@elif {
+
+}

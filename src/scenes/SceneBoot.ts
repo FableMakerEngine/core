@@ -1,4 +1,4 @@
-import { Scene, AssetLoader, Keyboard, Key, Entity } from 'cyclops';
+import { Scene, AssetLoader, Keyboard, Key, Entity, Mouse} from 'cyclops';
 import {utils, LoaderResource, Rectangle, Point } from 'pixi.js'
 
 export default class Boot extends Scene {
@@ -9,6 +9,7 @@ export default class Boot extends Scene {
   private enterKey = new Key('Enter');
 
   private leftKey = new Key('ArrowLeft');
+  private mouse = new Mouse();
 
   public override preload() {
     super.preload();
@@ -43,7 +44,7 @@ export default class Boot extends Scene {
     if (this.keyboard.isKeyDown(this.enterKey)) {
       this.game.sceneLoader.change('map');
     }
-    if (this.keyboard.isKeyDown(this.leftKey)) {
+    if (this.keyboard.isKeyDown(this.leftKey) || this.mouse.isMouseDown()) {
       this.entity.rotation -= 0.1 * dt;
     }
   }
