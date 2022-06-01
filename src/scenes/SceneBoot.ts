@@ -1,5 +1,5 @@
-import { Scene, AssetLoader, Keyboard, Key, Entity, Mouse} from 'cyclops';
-import {utils, LoaderResource, Rectangle, Point } from 'pixi.js'
+import { Scene, AssetLoader, Entity, Mouse, Keyboard, Key, Button, MouseButton } from 'cyclops';
+import { utils, LoaderResource, Rectangle, Point } from 'pixi.js'
 
 export default class Boot extends Scene {
   private entity: Entity;
@@ -10,11 +10,13 @@ export default class Boot extends Scene {
 
   private leftKey = new Key('ArrowLeft');
   private mouse = new Mouse();
+  private leftMouse = new Button('left', MouseButton.LEFT);
 
   public override preload() {
     super.preload();
     this.keyboard.addKey(this.enterKey);
     this.keyboard.addKey(this.leftKey);
+    this.mouse.addButton(this.leftMouse);
     AssetLoader.add('shroom.png', 'pictures/');
   }
 
@@ -44,7 +46,7 @@ export default class Boot extends Scene {
     if (this.keyboard.isKeyDown(this.enterKey)) {
       this.game.sceneLoader.change('map');
     }
-    if (this.keyboard.isKeyDown(this.leftKey) || this.mouse.isMouseDown()) {
+    if (this.keyboard.isKeyDown(this.leftKey) || this.mouse.isPressed(this.leftMouse)) {
       this.entity.rotation -= 0.1 * dt;
     }
   }
