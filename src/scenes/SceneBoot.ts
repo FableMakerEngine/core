@@ -43,10 +43,10 @@ export default class Boot extends Scene {
   }
 
   public override update(dt?: number) {
-    if (this.keyboard.isKeyDown(this.enterKey)) {
+    if (this.keyboard.isPressed(this.enterKey)) {
       this.game.sceneLoader.change('map');
     }
-    if (this.keyboard.isKeyDown(this.leftKey) || this.mouse.isPressed(this.leftMouse)) {
+    if (this.keyboard.isPressed(this.leftKey) || this.mouse.isPressed(this.leftMouse)) {
       this.entity.rotation -= 0.1 * dt;
     }
   }
