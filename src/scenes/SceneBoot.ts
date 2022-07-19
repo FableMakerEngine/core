@@ -1,5 +1,8 @@
 import { Scene, AssetLoader, Entity, Mouse, Keyboard, Key, Button, MouseButton } from 'cyclops';
 import { utils, LoaderResource, Rectangle, Point } from 'pixi.js'
+import {DataActor} from '../objects/Actor';
+
+
 
 export default class Boot extends Scene {
   private entity: Entity;
@@ -18,6 +21,7 @@ export default class Boot extends Scene {
     this.keyboard.addKey(this.leftKey);
     this.mouse.addButton(this.leftMouse);
     AssetLoader.add('shroom.png', 'pictures/');
+    AssetLoader.add('Actors.json','data/');
   }
 
   public override create(resources: utils.Dict<LoaderResource>) {
@@ -40,6 +44,8 @@ export default class Boot extends Scene {
     };
     this.entity = new Entity(entity.data, entity.coords);
     this.addChild(this.entity);
+    const json = AssetLoader.getData<DataActor[]>('Actors');
+    console.log(json[1].name);
   }
 
   public override update(dt?: number) {

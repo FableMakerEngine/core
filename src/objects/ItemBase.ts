@@ -34,7 +34,7 @@ export default class ItemBase {
    * @type {Texture}
    * @todo should the icon be just an index instead since it's already loaded?
    */
-  public icon: Texture;
+  public icon: Texture | undefined;
 
   /**
    * the item description
@@ -68,7 +68,7 @@ export default class ItemBase {
    * @returns {Texture<Resource>}
    * @private
    */
-  private static fetchTextureIcon(icon: string): Texture<Resource> {
+  private static fetchTextureIcon(icon: string): Texture<Resource> | undefined {
     return AssetLoader.get(icon).texture;
   }
 }

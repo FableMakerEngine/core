@@ -1,5 +1,4 @@
-import ItemBase, {DataItem} from './objects/ItemBase';
-
+import ItemBase, { DataItem } from './objects/ItemBase';
 /*  TEMP */
 const DATABASE: DataItem[] = [
   null
@@ -12,7 +11,10 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min((Math.max(value, min), max));
 }
 
-export default class Inventory {
+/**
+ * the class that handle the inventory
+ */
+export class Inventory {
 
   private readonly inventory: ItemBase[];
 
@@ -44,15 +46,52 @@ export default class Inventory {
     }
   }
 
-  public removeItem(id: number, amount = 1){
-    if(!this.isInInventory(id)){
+  /**
+   * remove an item from the inventory
+   * @param {number} id - the item id 
+   * @param {number} amount - the item amount
+   */
+  public removeItem(id: number, amount = 1) {
+    if (!this.isInInventory(id)) {
       return;
     }
-    for(const item of this.inventory){
-      if(item.id === id){
-        if(item.amount)
+    for (const item of this.inventory) {
+      const index = this.getItemIndex(id);
+      if (item.id === id) {
+        if (item.amount - amount <= 0) {
+          this.inventory.splice(index, 1);
+          break;
+        } else {
+          item.amount - amount;
+        }
       }
     }
+  }
+
+  /**
+   * return an item from the database
+   * due to the nature of fable maker inventory can have different
+   * implementations of the item structure so it's better to cast the type
+   * @example const item: MyItemType = this.inventory.getItem(id);
+   * @param {number} id - the item id;
+   * @returns 
+   */
+  public getItem(id: number): any {
+    if (this.isInInventory(id)) {
+      const index = this.getItemIndex(id);
+      return this.inventory[index];
+    }
+  }
+
+  public getItemIndex(id: number): number {
+    let index = 0;
+    for (let i = 0; i < this.inventory.length; i++) {
+      if (this.inventory[i].id === id) {
+        index = i;
+        break;
+      }
+    }
+    return index;
   }
 
   /**
@@ -63,8 +102,6 @@ export default class Inventory {
   public isInInventory(id: number): boolean {
     return this.inventory.some(item => {
       return item.id === id;
-    })
+    });
   }
-
-
 }
