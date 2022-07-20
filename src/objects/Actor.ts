@@ -1,6 +1,5 @@
 import { Point } from 'pixi.js';
 import { Entity, DataEntity} from 'cyclops';
-
 /* the interface that shape the data of an actor */
 export interface DataActor extends DataEntity {
   name: string;
