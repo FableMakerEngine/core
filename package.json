@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/FableMakerEngine/core#readme",
   "dependencies": {
+    "@pixi/sound": "^4.2.0",
     "cyclops": "file:../cyclops"
   },
   "devDependencies": {
