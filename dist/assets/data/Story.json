@@ -1,0 +1,43 @@
+[
+  {
+    "id": "start",
+    "dialogue": "You see a strange fire under the place \n what do you do?",
+    "choices": [
+      {
+        "text": "touch it",
+        "goto": "burned",
+        "action": "console.log('oops')"
+      },
+      {
+        "text": "light it off",
+        "conditions": "inventory.waterBucket === true",
+        "goto": "extinguished"
+      },
+      {
+        "text": "You wonder where there's a lit fire in this place.",
+        "conditions": "inventory.waterBucket === true",
+        "goto": "looking"
+      },
+      {
+        "text": "light it off",
+        "conditions": "inventory.waterBucket === true",
+        "goto": "extinguished"
+      }
+    ]
+  },
+  {
+    "id": "burned",
+    "dialogue": "You burned your hand off!",
+    "goto": "GAME_OVER"
+  },
+  {
+    "id": "extinguished",
+    "dialogue": "you extinguished the fire!",
+    "goto": "GAME_OVER"
+  },
+  {
+    "id": "looking",
+    "dialogue": "It is true that the fire is placed to quite the unusual place",
+    "goto": "start"
+  }
+]

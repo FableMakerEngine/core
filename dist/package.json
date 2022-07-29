@@ -1,9 +1,12 @@
 {
   "name": "pixi-game-base",
   "main": "index.html",
+  "chromium-args": "--load-extension='C:/Users/nioPC/Documents/GitKraken/FableEngine/core/dist/plugins/aamddddknhcagpehecnhphigffljadon'",
   "type": "module",
   "window": {
-    "width": 640,
-    "height": 480
+    "width": 1920,
+    "height": 1080,
+    "min_width": 1920,
+    "max_height": 1080
   }
 }
