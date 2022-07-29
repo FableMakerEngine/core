@@ -11,7 +11,8 @@
       "nwjsVersion": "any",
       "webRoot": "${workspaceFolder}/dist",
       "sourceMaps": true,
-      "reloadAfterAttached": true
+      "reloadAfterAttached": true,
+      
     }
   ]
 }

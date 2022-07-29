@@ -1,75 +1,123 @@
-export interface StoryNode {
-  id: number;
+import { Database } from "./Database";
+import {Evaluator} from "./Evaluator";
+
+export interface DataStory {
+  id: string;
   dialogue: string;
-  goto?: number;
-  actions?: () => void;
+  action?: string;
+  goto?: string;
+  choices?: {
+    text: string,
+    goto: string,
+    conditions?: string;
+    action?: string;
+  }[];
 }
-export interface ChoiceNode extends StoryNode {
-  choices: {
-    text: string;
-    conditions?: (state?) => boolean;
-    action?: () => void;
-    goto: number | "() => number";
-  }[]
-}
-
-export interface ImageNode extends StoryNode {
-  texture: string,
-}
-
+/*
+const story: DataStory[] = [
+  {
+    id: 'start',
+    dialogue: "You see a strange fire under the place \n what do you do?",
+    choices: [
+      {
+        text: "touch it",
+        goto: 'burned'
+      },
+      {
+        text: "light it off",
+        conditions: () => inventory.waterBucket === true,
+        goto: 'extinguished'
+      },
+      {
+        text: "You wonder where there's a lit fire in this place.",
+        conditions: () => inventory.waterBucket === true,
+        goto: 'looking'
+      },
+      {
+        text: "light it off",
+        conditions: () => inventory.waterBucket === true,
+        goto: 'extinguished'
+      }
+    ]
+  },
+  {
+    id: 'burned',
+    dialogue: "You burned your hand off!",
+    goto: 'GAME_OVER'
+  },
+  {
+    id: 'extinguished',
+    dialogue: "you extinguished the fire!",
+    goto: 'GAME_OVER'
+  },
+  {
+    id: 'looking',
+    dialogue: "It is true that the fire is placed to quite the unusual place",
+    goto: 'start'
+  }
+];
+*/
 
 export class StoryManager {
 
-  private static stories: Map<string, StoryNode[]>
-  private static node: StoryNode | null | undefined;
-  private static nodeId: number;
-  private static currentStory: string;
+  public static currentNode: DataStory;
+  public static id: string = 'notStarted';
+  private static story: DataStory[];
+  /*
+  public static inventory  = {
+    waterBucket: false
+  }
+  */
+  
 
-  public static init() {
-    this.stories = new Map();
-    this.node = null;
-    this.nodeId = -1;
-    this.currentStory = '';
+  public static init(story: DataStory[]) {
+    this.story = story;
+    this.id = 'start';
+    this.currentNode = this.findNode(this.id);
   }
 
-  public static start(story: string){
-    this.nodeId = 0;
-    this.currentStory = story;
-    const id = this.nodeId;
-    this.node = this.stories.get(story)?.find((story) => {story.id === id});
+  public static findNode(id: string): DataStory {
+    //@ts-ignore
+    return this.story.find(node => node.id === id);
   }
 
-  public static continue(){
-    
+  public static hasChoices() {
+    return this.currentNode?.choices !== undefined;
   }
 
-  public static createStory(name: string) {
-    if (this.stories.has(name)) {
-      throw new Error(`The story ${name} has already been registred!`);
+  public static hasConditions(index: number) {
+    //@ts-ignore
+    return this.currentNode.choices[index].conditions !== undefined;
+  }
+
+  public static conditions(index: number): boolean {
+    const condition = this.currentNode.choices[index].conditions;
+    return Evaluator.eval(condition,null,true);
+  }
+
+  public static choices() {
+    return this.currentNode?.choices;
+  }
+
+  public static progress(index: string) {
+    this.id = index;
+    this.currentNode = this.findNode(index);
+  }
+
+  public static hasAction(index: number){
+    if(index === -1){
+      return this.currentNode.action !== undefined;
+    } else {
+      return this.currentNode.choices[index].action !== undefined;
     }
-    this.stories.set(name, []);
+  }
+  public static executeAction() {
+    //@ts-ignore
+    window.eval(this.currentNode.action);
   }
 
-  public static addText(story: string, node: StoryNode) {
-    if (!this.stories.has(story)) {
-      throw new Error(`The story ${story} doesn't exists!`);
-    }
-    this.stories.get(story)?.push(node);
+  public static executeChoiceAction(index: number) {
+    //@ts-ignore
+    window.eval(this.currentNode.choices[index].action)
   }
-
-  public static addChoice(story: string, node: ChoiceNode) {
-    if (!this.stories.has(story)) {
-      throw new Error(`The story ${story} doesn't exists!`);
-    }
-    this.stories.get(story)?.push(node);
-  }
-
-  public static addImage(story: string, node: ImageNode) {
-    if (!this.stories.has(story)) {
-      throw new Error(`The story ${story} doesn't exists!`);
-    }
-    this.stories.get(story)?.push(node);
-  }
-
-
 }

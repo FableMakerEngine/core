@@ -1,10 +1,8 @@
 
 
-import {Point} from "pixi.js";
-import Actor, {DataActor} from "./Actor";
+interface PlayerData {
+  name: string;
 
-export interface DataPlayer extends DataActor {
-  
 }
 
 /**
@@ -14,11 +12,18 @@ export interface DataPlayer extends DataActor {
  * by concept theirs should be only have one player
  * instance per game file
  *
- * @extends Actor
  */
-export default class Player extends Actor {
+export class Player  {
+
+  public name: string;
+  public stats: {}
+  public inventory: {}
   
-  constructor(data: DataPlayer, coords: Point) {
-    super(data,coords);
+  constructor() {
+
+  }
+
+  public restoreData(data: PlayerData){
+
   }
 }

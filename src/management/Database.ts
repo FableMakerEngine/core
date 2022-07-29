@@ -1,5 +1,6 @@
 import { AssetLoader } from "cyclops";
 import ItemBase from "../objects/ItemBase";
+import { DataStory } from "./StoryManager";
 
 
 export class Database {
@@ -7,20 +8,35 @@ export class Database {
   private static registry = new Map();
 
   public static $dataItems: ItemBase[];
+  public static $dataStory: DataStory[];
 
+  public static preload(){
+    this.LoadData();
+  }
   public static init() {
+
     this.buildRegistry();
-    this.$dataItems = this.get('items');
+ //   this.$dataItems = this.get('Items');
+    this.$dataStory = this.get('Story');
   }
 
-  private static buildRegistry() {
-    this.add('items', 'DataItems');
+  private static LoadData() {
+    this.load('Items.json','data/');
+    this.load('Story.json','data/');
   }
 
-  public static add(key: string, json: string) {
-    const data = AssetLoader.getData(json);
+  private static buildRegistry(){
+    this.add('Story');
+  }
+  private static load(filename: string, dir: string){
+    AssetLoader.add(filename,dir);
+  }
+
+  public static add(key: string) {
     if (!this.registry.has(key)) {
+      const data = AssetLoader.getData(key);
       this.registry.set(key, data);
+
     } else {
       throw new Error(`the data ${key} is already assigned!`);
     }

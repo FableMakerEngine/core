@@ -1,5 +1,22 @@
-import { AssetLoader, AudioLoader, Button, Mouse, MouseButton, Scene } from "cyclops";
-import { Sprite, utils, LoaderResource, Text, TextStyle, Texture, Container } from "pixi.js";
+import { AssetLoader, Button, Mouse, MouseButton, Scene } from "cyclops";
+import { Sprite, utils, LoaderResource, Text, Container, Rectangle } from "pixi.js";
+import { SpriteButton, SpriteCommands, SpriteDebug } from "../sprites";
+import { Database } from "../management";
+import { style } from "../Constant";
+import { StoryManager } from "../management";
+
+//import { sound } from '@pixi/sound';
+import { AUDIO_TYPE, Audio } from "../management/Audio";
+
+
+Audio.add('dungeon', 'bgm/Dungeon6.ogg', AUDIO_TYPE.BGM);
+
+/*
+sound.add('dungeon',{
+  url: './assets/audio/bgm/Dungeon6.ogg',
+  loaded: ()=> alert('sound is loaded!')
+});
+*/
 
 
 /**
@@ -9,180 +26,85 @@ import { Sprite, utils, LoaderResource, Text, TextStyle, Texture, Container } fr
 
 const test = "I am a very nice text :> \n and I can produce space!";
 
-const style = new TextStyle({
-  fontFamily: "Georgia",
-  fontSize: 40,
-  wordWrap: true,
-  wordWrapWidth: 550
-});
 
-const inventory = {
-  waterBucket: true
-}
-
-interface DataStory {
-  id: string;
-  dialogue: string;
-  action?: () => void;
-  goto?: string;
-  choices?: {
-    text: string,
-    goto: string,
-    conditions?: () => boolean;
-    action?: () => void;
-  }[];
-}
-
-const story: DataStory[] = [
-  {
-    id: 'start',
-    dialogue: "You see a strange fire under the place \n what do you do?",
-    choices: [
-      {
-        text: "touch it",
-        goto: 'burned'
-      },
-      {
-        text: "light it off",
-        conditions: () => inventory.waterBucket === true,
-        goto: 'extinguished'
-      },
-      {
-        text: "You wonder where there's a lit fire in this place.",
-        conditions: () => inventory.waterBucket === true,
-        goto: 'looking'
-      },
-      {
-        text: "light it off",
-        conditions: () => inventory.waterBucket === true,
-        goto: 'extinguished'
-      }
-    ]
-  },
-  {
-    id: 'burned',
-    dialogue: "You burned your hand off!",
-    goto: 'GAME_OVER'
-  },
-  {
-    id: 'extinguished',
-    dialogue: "you extinguished the fire!",
-    goto: 'GAME_OVER'
-  },
-  {
-    id: 'looking',
-    dialogue: "It is true that the fire is placed to quite the unusual place",
-    goto: 'start'
-  }
-];
-
-export class SpriteButton extends Sprite {
-
-  public label: Text;
-
-  constructor(texture: Texture, text: string = "0") {
-    super(texture);
-    this.anchor.set(0.5);
-    this.interactive = true;
-    this.label = new Text(text, style);
-    this.label.anchor.set(0.5, 0.5);
-    this.addChild(this.label);
-  }
-
-  public setText(value: string) {
-    this.label.text = value;
-  }
-
-}
-
-export class StoryManager {
-
-  public static currentNode: DataStory = null;
-  public static id: string = 'notStarted';
-
-  public static init() {
-    this.id = 'start';
-    this.currentNode = this.findNode(this.id);
-  }
-
-  public static findNode(id: string) {
-    return story.find(node => node.id === id);
-  }
-
-  public static hasChoices() {
-    return this.currentNode.choices !== undefined;
-  }
-
-  public static hasConditions(index: number) {
-    return this.currentNode.choices[index].conditions !== undefined;
-  }
-
-  public static choices() {
-    return this.currentNode.choices;
-  }
-
-  public static progress(index: string) {
-    this.id = index;
-    this.currentNode = this.findNode(index);
-  }
-
-  public static executeAction(){
-    this.currentNode.action();
-  }
-
-  public static executeChoiceAction(index:number){
-    this.currentNode.choices[index].action();
-  }
-}
-const DEBUG = true;
 
 export class SceneStory extends Scene {
 
   private mouse = new Mouse();
   private leftMouse = new Button('left', MouseButton.LEFT);
   private background: Sprite;
-  private paper: Sprite;
   private overlay: Sprite;
   private dialogue: Text;
-  private buttons: Container;
+  private buttons: Sprite;
   private okButtons: SpriteButton;
+  private debugSprite: SpriteDebug;
+  private testCommand: SpriteCommands;
 
   public override preload() {
     super.preload();
     this.mouse.addButton(this.leftMouse);
+    Database.preload();
     AssetLoader.add('background.png', 'pictures/');
     AssetLoader.add('paper.png', 'pictures/');
     AssetLoader.add('overlay.png', 'pictures/');
     AssetLoader.add('button.png', 'pictures/');
-    AudioLoader.add('Dungeon6.ogg','bgm/');
+    AssetLoader.add('ui.png', 'pictures/');
+
+
   }
 
   public override create(resources: utils.Dict<LoaderResource>) {
     super.create(resources);
+    this.createBackground(resources);
+    this.createOverlays(resources);
+    this.createDialogue();
+    this.createContinueButton(resources);
+    //const rect = new Rectangle(this.game.width / 2, this.game.height / 2, 550, this.dialogue.height);
+    //const debugBox = new SpriteDebug(rect, 0xff0000);
 
-    StoryManager.init();
+    // this.addChild(debugBox);
+    this.testCommand = new SpriteCommands(resources.button.texture);
+    this.testCommand.x = this.game.width / 2;
+    this.testCommand.y = this.game.height / 2;
+    //  this.createButtons(resources);
+    const red = utils.rgb2hex([1, 0, 0]);
+    const blue = utils.rgb2hex([0, 0, 1]);
+    this.debugSprite = new SpriteDebug(new Rectangle(this.testCommand.width / 2, 0, this.testCommand.width, this.testCommand.height), red);
+   // const dot = new SpriteDebug(new Rectangle(this.testCommand.width / 2, 0, 10, 10), blue);
 
+    //console.log([debugSprite.width,debugSprite.height]);
+    // const dot = new SpriteDebug(new Rectangle(this.buttons.width / 2, this.buttons.height / 2, 10, 10), blue);
+    this.addChild(this.testCommand);
+  //  this.testCommand.addChild(this.debugSprite);
+ //   this.testCommand.addChild(dot);
+    Database.init();
+    StoryManager.init(Database.$dataStory);
+    this.start();
+
+  }
+
+  private createBackground(resources: utils.Dict<LoaderResource>) {
     this.background = new Sprite(resources.background.texture);
+    this.addChild(this.background);
+  }
+
+  private createOverlays(resources: utils.Dict<LoaderResource>) {
     this.overlay = new Sprite(resources.overlay.texture);
+    this.addChild(this.overlay);
+  }
+
+  private createDialogue() {
     this.dialogue = new Text(test, style);
     this.dialogue.anchor.x = 0.5;
     this.dialogue.anchor.y = 0.5;
     this.dialogue.x = this.center(this.game.width);
+
     this.dialogue.y = this.center(this.game.height);
-    const debugBox = new Sprite(Texture.WHITE);
-    debugBox.anchor.x = 0.5;
-    debugBox.anchor.y = 0.5;
-    debugBox.x = this.game.width / 2;
-    debugBox.y = this.game.height / 2;
-    debugBox.width = 550;
-    debugBox.height = this.dialogue.height;
-    debugBox.tint = 0xff0000;
-    if (DEBUG) {
-      debugBox.alpha = 0.5;
-    } else {
-      debugBox.visible = false;
-    }
-    // ok button
+
+    this.addChild(this.dialogue);
+  }
+
+  private createContinueButton(resources: utils.Dict<LoaderResource>) {
     this.okButtons = new SpriteButton(resources.button.texture, 'Continue');
     this.okButtons.anchor.set(0.5, 0.5);
     this.okButtons.x = this.game.width / 2;
@@ -193,26 +115,18 @@ export class SceneStory extends Scene {
     this.okButtons.visible = false;
     this.okButtons.on('mouseover', (event) => { this.okButtons.scale.set(1.2, 1.2) });
     this.okButtons.on('mouseout', (event) => { this.okButtons.scale.set(1, 1) });
-    this.addChild(this.background);
-    console.log(AudioLoader.get('Dungeon6').sound);
-    this.addChild(this.overlay);
-    this.addChild(debugBox);
-    this.addChild(this.dialogue);
-    this.createButtons(resources);
     this.addChild(this.okButtons);
-    this.start();
-
   }
 
   public override start() {
     super.start();
+
     const story = StoryManager.currentNode;
     this.dialogue.text = story.dialogue;
-
     if (StoryManager.hasChoices()) {
-      this.displayChoices();
+      //   this.displayChoices();
     }
-   // AudioLoader.playBgm('dungeon6',1);
+    //  Audio.play('dungeon', 0.1);
   }
 
   public onContinue() {
@@ -226,7 +140,8 @@ export class SceneStory extends Scene {
     for (let i = 0; i < choices.length; i++) {
       const child = this.buttons.children[i] as SpriteButton;
       if (StoryManager.hasConditions(i)) {
-        if (choices[i].conditions()) {
+        const condition = StoryManager.conditions(i);
+        if (condition) {
 
           child.visible = true;
           child.setText(choices[i].text);
@@ -246,6 +161,10 @@ export class SceneStory extends Scene {
 
   public onChoice(index: number) {
     const choice = StoryManager.choices()[index];
+    if (StoryManager.hasAction(index)) {
+      console.log("it went there");
+      StoryManager.executeChoiceAction(index);
+    }
     StoryManager.progress(choice.goto);
     this.refresh();
   }
@@ -273,13 +192,15 @@ export class SceneStory extends Scene {
     }
     this.okButtons.visible = false;
   }
+
   private createButtons(resources: utils.Dict<LoaderResource>) {
-    this.buttons = new Container();
+    this.buttons = new Sprite();
     this.addChild(this.buttons);
 
     for (let i = 0; i < 4; i++) {
       const button = new SpriteButton(resources.button.texture, String(i));
-      button.on('pointerdown', this.onChoice.bind(this, i));
+      console.log(`the button_${i} has a size of ${button.width},${button.height}`);
+      //  button.on('pointerdown', this.onChoice.bind(this, i));
 
       button.on('mouseover', (event) => { button.scale.set(1.2, 1.2) });
       button.on('mouseout', (event) => { button.scale.set(1, 1) });
@@ -290,14 +211,30 @@ export class SceneStory extends Scene {
       button.visible = false;
       this.buttons.addChild(button);
     }
-    this.buttons.pivot.x = 0.5;
-    this.buttons.pivot.y = 0.5;
-    this.buttons.x = this.game.width / 2 - 200;
-    this.buttons.y = this.game.height / 2 + 250;
+    this.buttons.anchor.set(0.5, 0.5);
+
+    this.buttons.x = this.game.width / 2 // - 200;
+
+    this.buttons.y = this.game.height / 2 //+ 250;
     this.buttons.visible = true;
+    const blue = utils.rgb2hex([0, 0, 1]);
+    const red = utils.rgb2hex([1, 0, 0]);
+    this.debugSprite = new SpriteDebug(new Rectangle(this.buttons.width / 2, this.buttons.height / 2, this.buttons.width, this.buttons.height), red);
+    //console.log([debugSprite.width,debugSprite.height]);
+    // const dot = new SpriteDebug(new Rectangle(this.buttons.width / 2, this.buttons.height / 2, 10, 10), blue);
+
+    this.buttons.addChild(this.debugSprite);
+    // this.buttons.addChild(dot);
+    console.log(`the scene container size is : ${this.width},y: ${this.height}`);
+    console.log(`the buttons container coords is : ${this.buttons.x}, ${this.buttons.y}`);
+    console.log(`the buttons container size is : ${this.buttons.width}, ${this.buttons.height}`);
   }
 
   public center(axis: number): number {
     return axis / 2;
+  }
+
+  public override update(dt: number) {
+    super.update(dt);
   }
 }
